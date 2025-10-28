@@ -827,7 +827,9 @@ section {
     padding: 0;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1;
     transition: background 0.3s;
 }
 
@@ -848,7 +850,7 @@ section {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     position: absolute;
-    right: 65px;
+    right: calc(44px + 0.5rem);
     top: 50%;
     transform: translateY(-50%);
 }
