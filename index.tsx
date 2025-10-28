@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 const API_KEY = process.env.API_KEY;
@@ -15,6 +14,13 @@ const loader = document.getElementById('loader');
 const skillsCanvas = document.getElementById('skills-canvas') as HTMLCanvasElement;
 const profileCanvas = document.getElementById('profile-canvas') as HTMLCanvasElement;
 
+// Modal Elements
+const chatBubble = document.getElementById('chat-bubble');
+const chatModalContainer = document.getElementById('chat-modal-container');
+const emailModalContainer = document.getElementById('email-modal-container');
+const getInTouchBtn = document.getElementById('get-in-touch-btn');
+const modalContainers = document.querySelectorAll('.modal-container');
+
 
 // --- Typing Animation ---
 const words = ["PLC Programmer", "SCADA Specialist", "Commissioning Engineer"];
@@ -24,6 +30,7 @@ let currentWord = "";
 let isDeleting = false;
 
 function type() {
+    if(!typingText) return;
     currentWord = words[i];
     if (isDeleting) {
         j--;
@@ -64,7 +71,6 @@ const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('active');
-            // We don't unobserve, so animations can re-trigger if needed, or adjust logic here
         }
     });
 }, { threshold: 0.1 });
@@ -338,6 +344,7 @@ const getResumeContext = () => {
     const about = document.getElementById('about')?.innerText;
     const skills = document.getElementById('skills')?.innerText;
     const experience = document.getElementById('experience')?.innerText;
+    const education = document.getElementById('education')?.innerText;
     const projects = document.getElementById('projects')?.innerText;
     return `
         This is the resume information for Ruturaj Gawade, an Automation & Control Engineer.
@@ -347,6 +354,8 @@ const getResumeContext = () => {
         SKILLS: ${skills}
         ---
         EXPERIENCE: ${experience}
+        ---
+        EDUCATION: ${education}
         ---
         PROJECTS: ${projects}
         ---
@@ -414,7 +423,33 @@ function showLoader(show: boolean) {
     }
 }
 
-// --- Event Listeners ---
+// --- Modal Logic ---
+function openModal(modal: HTMLElement | null) {
+    if (modal) modal.classList.add('active');
+}
+
+function closeModal() {
+    modalContainers.forEach(modal => modal.classList.remove('active'));
+}
+
+chatBubble?.addEventListener('click', () => openModal(chatModalContainer));
+getInTouchBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal(emailModalContainer);
+});
+
+modalContainers.forEach(modal => {
+    const closeBtn = modal.querySelector('.close-btn');
+    closeBtn?.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+});
+
+
+// --- Event Listeners & Initializations ---
 document.addEventListener('DOMContentLoaded', () => {
     type();
     addMessageToHistory('ai', "Hello! I am Ruturaj's AI assistant. Feel free to ask me anything about his resume.");
@@ -427,19 +462,19 @@ chatInput?.addEventListener('keypress', (e) => {
     }
 });
 
-// --- Smooth Scrolling and Mobile Menu Management ---
+// --- Smooth Scrolling and Modal/Menu Management ---
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault(); // Prevent default anchor behavior to avoid routing issues.
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
 
-        // Close mobile menu if the link is inside it
         if (navUl && navUl.contains(anchor)) {
             navUl.classList.remove('active');
         }
 
-        const targetId = this.getAttribute('href');
-        // Make sure we have a valid target ID
-        if (targetId && targetId !== '#') {
+        if (targetId === '#contact') {
+            openModal(chatModalContainer);
+        } else if (targetId && targetId !== '#') {
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 targetElement.scrollIntoView({

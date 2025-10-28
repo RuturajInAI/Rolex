@@ -24,6 +24,7 @@
             <li><a href="#about">About</a></li>
             <li><a href="#skills">Skills</a></li>
             <li><a href="#experience">Experience</a></li>
+            <li><a href="#education">Education</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#contact">AI Assistant</a></li>
         </ul>
@@ -40,7 +41,7 @@
             <div class="hero-content">
                 <h1 class="glitch" data-text="Ruturaj Gawade">Ruturaj Gawade</h1>
                 <p>Automation & <span id="typing-text"></span></p>
-                <a href="#contact" class="btn">Get In Touch</a>
+                <a href="#" id="get-in-touch-btn" class="btn">Get In Touch</a>
             </div>
         </header>
 
@@ -72,21 +73,41 @@
 
         <section id="experience" class="reveal">
             <h2>Experience</h2>
-            <div class="timeline">
-                <div class="timeline-item reveal">
-                    <h3>Automation & Commissioning Engineer</h3>
-                    <p><em>Promatics Solutions</em> | 03.2021 - 04.2024</p>
-                    <p>Executed automation and process control projects for multiple international clients, focusing on PLC/HMI logic development, on-site commissioning, and fault analysis.</p>
-                    <div class="details">
-                        <ul>
-                            <li>Developed PLC and HMI logic for an Automotive Test Loop Line for a German client using Mitsubishi FX5U.</li>
-                            <li>Programmed a Siemens S7-1200 based boiler house with WinCC SCADA for an Indian client.</li>
-                            <li>Modified and commissioned Allen-Bradley CompactLogix logic for a Multi-Lift & Conveyor system for a UK client.</li>
-                            <li>Designed servo/stepper-based press systems with Siemens S7-1200 for a US client.</li>
-                            <li>Developed and commissioned five independent grinding lines under a centralized SCADA for an Indian client.</li>
-                        </ul>
+            <div class="experience-card reveal">
+                <h3>Automation & Commissioning Engineer</h3>
+                <p class="company-info"><em>Promatics Solutions</em> | Pune, India | 03.2021 - 04.2024</p>
+                <p>Executed automation and process control projects for multiple international clients, focusing on PLC/HMI logic development, on-site commissioning, and fault analysis.</p>
+                <div class="details">
+                    <ul>
+                        <li>Developed PLC and HMI logic for an Automotive Test Loop Line for a German client using Mitsubishi FX5U.</li>
+                        <li>Programmed a Siemens S7-1200 based boiler house with WinCC SCADA for an Indian client.</li>
+                        <li>Modified and commissioned Allen-Bradley CompactLogix logic for a Multi-Lift & Conveyor system for a UK client.</li>
+                        <li>Designed servo/stepper-based press systems with Siemens S7-1200 for a US client.</li>
+                        <li>Developed and commissioned five independent grinding lines under a centralized SCADA for an Indian client.</li>
+                    </ul>
+                </div>
+                <button class="read-more-btn">Read More</button>
+            </div>
+        </section>
+        
+        <section id="education" class="reveal">
+            <h2>Education</h2>
+            <div class="education-grid">
+                 <div class="education-card reveal">
+                    <div class="education-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="education-content">
+                        <h3>Master in Digital Engineering</h3>
+                        <p>Otto von Guericke University Magdeburg, Germany</p>
+                        <p class="dates">04.2024 - Present</p>
                     </div>
-                    <button class="read-more-btn">Read More</button>
+                </div>
+                 <div class="education-card reveal">
+                    <div class="education-icon"><i class="fas fa-university"></i></div>
+                    <div class="education-content">
+                        <h3>Bachelor of Technology in Electrical Engineering</h3>
+                        <p>Savitribai Phule Pune University, India</p>
+                        <p class="dates">06.2020 - 07.2023</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -186,8 +207,15 @@
                 </div>
             </div>
         </section>
+    </main>
 
-        <section id="contact" class="reveal">
+    <div id="chat-bubble">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div id="chat-modal-container" class="modal-container">
+        <div class="modal-content">
+            <button class="close-btn" aria-label="Close">&times;</button>
             <h2>AI Assistant</h2>
             <p class="subheading">Ask my AI assistant any questions you have about my experience or skills!</p>
             <div class="chat-container">
@@ -200,9 +228,18 @@
                 </div>
                  <div id="loader" class="hidden"></div>
             </div>
-        </section>
+        </div>
+    </div>
 
-    </main>
+    <div id="email-modal-container" class="modal-container">
+        <div class="modal-content">
+            <button class="close-btn" aria-label="Close">&times;</button>
+            <h2>Get In Touch</h2>
+            <p>You can reach out to Ruturaj directly via email:</p>
+            <a href="mailto:ruturajabroad@gmail.com" class="email-link">ruturajabroad@gmail.com</a>
+        </div>
+    </div>
+
 
     <footer>
         <p>&copy; 2024 Ruturaj Gawade. All rights reserved.</p>
