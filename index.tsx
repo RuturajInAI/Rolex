@@ -340,25 +340,59 @@ try {
 }
 
 const getResumeContext = () => {
-    // Scrape data from the page to provide context to the AI
-    const about = document.getElementById('about')?.innerText;
-    const skills = document.getElementById('skills')?.innerText;
-    const experience = document.getElementById('experience')?.innerText;
-    const education = document.getElementById('education')?.innerText;
-    const projects = document.getElementById('projects')?.innerText;
     return `
-        This is the resume information for Ruturaj Gawade, an Automation & Control Engineer.
-        ---
-        ABOUT: ${about}
-        ---
-        SKILLS: ${skills}
-        ---
-        EXPERIENCE: ${experience}
-        ---
-        EDUCATION: ${education}
-        ---
-        PROJECTS: ${projects}
-        ---
+        This is the resume information for Ruturaj Dilip Gawade. Use this data to answer questions.
+
+        --- START OF RESUME ---
+
+        Ruturaj Dilip Gawade
+        +49 15560133862 | ruturajabroad@gmail.com | Walther-Rathenau-Straße 55, 39104 Magdeburg | LinkedIn
+
+        PROFILE
+        Automation & Commissioning Engineer with 3 years of hands-on experience in PLC, HMI, and SCADA-based industrial automation, delivering projects for clients of German, Italian, UK, US, and Indian origin. Proficient in Siemens, Allen-Bradley, and Mitsubishi automation platforms with exposure to Beckhoff (TwinCAT) and Schneider control environments. Experienced in commissioning, troubleshooting, field integration, and remote customer support, ensuring reliable system performance under real production conditions. Currently pursuing M.Sc. in Digital Engineering at Otto von Guericke University Magdeburg, specializing in real-time industrial data synchronization and control system integration. Fluent in English (C1) and German (A2).
+
+        PROFESSIONAL EXPERIENCE
+        Automation & Commissioning Engineer
+        Promatics Solutions | 03.2021 - 04.2024 | Pune, India
+        Executed automation and process control projects for multiple international clients, focusing on PLC/HMI logic development, on-site commissioning, fault analysis, and customer handover documentation.
+
+        Key Projects:
+        - Automotive Test Loop Line (German Client): Developed PLC/HMI logic in Mitsubishi FX5U / GX Works 3 for conveyors, turntables, presses. Conducted simulation and field commissioning.
+        - Boiler House Automation (Indian Client): Programmed a Siemens S7-1200-based boiler house with WinCC SCADA. Managed production trials and resolved signal scaling issues.
+        - Multi-Lift & Conveyor Automation System (UK Client): Modified and commissioned Allen-Bradley CompactLogix / FactoryTalk View ME logic for lift synchronization.
+        - Tea Production Plant Automation (Indian Client): Delivered full-plant automation using Siemens S7-1200 and WinCC Runtime Advanced. Handled PID tuning, alarm setup, and remote support.
+        - Wheel Hub & Hydraulic Press Machines (US Client): Designed and programmed servo/stepper-based press systems with Siemens S7-1200 and AutoCAD Electrical. Oversaw on-site commissioning and MES communication.
+        - Axle & Wheel Hub Stud Press Line (Italian Client): Modified and validated PLC-HMI systems with OPC UA-based data exchange. Added safety-curtain logic.
+        - Spices Grinding & Packing Automation (Indian Client): Developed and commissioned five independent grinding lines under a centralized SCADA using Siemens S7-1400 / TIA Portal V14.
+        - Multi-Station Axle & Bearing Assembly SCADA (Italian Client): Enhanced ASEM HMI and Industrial PC SCADA connected to Siemens S7-1200/1500 PLCs. Reorganized ≈1800 alarms and implemented recipe management.
+        - Pharma Powder Conveying & Grinding Automation (Indian Client): Commissioned Allen-Bradley CompactLogix 5370 / FactoryTalk View ME system. Verified I/O signals and calibrated transmitters.
+
+        EDUCATION
+        - Master in Digital Engineering (04.2024 – Present)
+          Otto von Guericke University Magdeburg, Germany
+          Key Competencies: Industrial Automation & Control Systems, PLC & SCADA Integration, IoT & Edge Data Communication, Robotics & Machine Vision, Cybersecurity.
+        - Bachelor of Technology in Electrical Engineering (06.2020 - 07.2023)
+          Savitribai Phule Pune University, India
+          Key Competencies: PLC Programming & HMI Development, Industrial Instrumentation, Control Systems & Automation.
+
+        ACADEMIC PROJECTS
+        - (M.Sc.) Environmental Representation of Autonomous Robots: Developed a LiDAR- and radar-based detection system for an autonomous robot to classify humans vs. non-humans.
+        - (M.Sc.) Smart City Traffic Control and Safety Analysis: Designed a traffic simulation model in AnyLogic using real sensor data from Magdeburg City.
+        - (B.Tech.) PLC Development Using Arduino and Factory I/O Simulation: Built a low-cost automation prototype to simulate a complete packaging line.
+
+        TECHNICAL SKILLS
+        - PLC/SCADA Platforms: Siemens (TIA Portal, S7-1200/1400, WinCC), Allen-Bradley (CompactLogix, Studio 5000, FactoryTalk), Mitsubishi (FX5U, GX Works 3), Beckhoff TwinCAT, Schneider EcoStruxure.
+        - Protocols & Interfaces: OPC UA, Modbus TCP, MES, IIoT, Profinet, EtherCAT, EtherNet/IP.
+        - Core Skills: PLC Programming, HMI Design, SCADA Configuration, Commissioning, Troubleshooting, PID Control, Motion & Servo Integration, Safety Interlocks, Alarm & Data Handling, Recipe Management.
+
+        PROFESSIONAL SKILLS
+        System Commissioning, Troubleshooting & Testing, Emergency Site Support, PLC-HMI Integration, Field Device Configuration, Remote Monitoring & Customer Support, Documentation & Validation, Team Coordination.
+
+        LANGUAGES
+        - English: C1 (IELTS)
+        - German: A2 (currently improving)
+
+        --- END OF RESUME ---
     `;
 };
 
