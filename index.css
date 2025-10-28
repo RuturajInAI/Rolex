@@ -423,19 +423,12 @@ section {
 
 /* Experience Section & Project Section Commonalities */
 .details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
-    margin-top: 0.5rem;
+    display: none;
 }
 
 .details ul {
     list-style-position: inside;
     padding-left: 1rem;
-}
-
-.expanded .details {
-    max-height: 500px; /* Adjust as needed */
 }
 
 .read-more-btn {
@@ -863,6 +856,80 @@ section {
     to { transform: rotate(360deg); }
 }
 
+/* Project Modal Styles */
+.project-modal-content {
+    max-width: 900px;
+    width: 90%;
+}
+
+.project-modal-body {
+    display: flex;
+    gap: 2rem;
+}
+
+.project-modal-image-container {
+    flex: 1;
+    min-width: 280px;
+}
+
+#project-modal-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: #e0e0e0;
+}
+
+.project-modal-details {
+    flex: 2;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+.project-modal-details::-webkit-scrollbar {
+    width: 8px;
+}
+.project-modal-details::-webkit-scrollbar-track {
+    background: var(--card-bg-color);
+}
+.project-modal-details::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+
+#project-modal-title {
+    text-align: left;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+#project-modal-title::after {
+    left: 0;
+    transform: translateX(0);
+}
+
+#project-modal-details-content h4 {
+    color: var(--primary-color);
+    font-family: var(--font-secondary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+#project-modal-details-content p, #project-modal-details-content ul {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+#project-modal-details-content ul {
+    list-style-position: inside;
+    padding-left: 0.5rem;
+}
+#project-modal-details-content li {
+    margin-bottom: 0.5rem;
+}
+
+
 /* Footer */
 footer {
     text-align: center;
@@ -920,5 +987,12 @@ footer {
     .about-container {
         flex-direction: column;
         text-align: center;
+    }
+
+    .project-modal-body {
+        flex-direction: column;
+    }
+    .project-modal-details {
+         max-height: 50vh;
     }
 }

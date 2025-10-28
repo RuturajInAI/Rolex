@@ -18,6 +18,10 @@ const profileCanvas = document.getElementById('profile-canvas') as HTMLCanvasEle
 const chatBubble = document.getElementById('chat-bubble');
 const chatModalContainer = document.getElementById('chat-modal-container');
 const emailModalContainer = document.getElementById('email-modal-container');
+const projectModalContainer = document.getElementById('project-modal-container');
+const projectModalImg = document.getElementById('project-modal-img') as HTMLImageElement;
+const projectModalTitle = document.getElementById('project-modal-title');
+const projectModalDetailsContent = document.getElementById('project-modal-details-content');
 const getInTouchBtn = document.getElementById('get-in-touch-btn');
 const modalContainers = document.querySelectorAll('.modal-container');
 
@@ -80,19 +84,54 @@ revealElements.forEach(el => {
 });
 
 
-// --- "Read More" Toggle ---
+// --- "Read More" Logic for Project Modals ---
 const readMoreBtns = document.querySelectorAll('.read-more-btn');
 readMoreBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const parent = btn.parentElement;
-        parent?.classList.toggle('expanded');
-        if (parent?.classList.contains('expanded')) {
-            btn.textContent = 'Read Less';
-        } else {
-            btn.textContent = 'Read More';
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const projectCard = (btn as HTMLElement).closest('.project-card, .experience-card');
+        if (!projectCard) return;
+
+        // Handle Experience card expansion separately
+        if (projectCard.classList.contains('experience-card')) {
+            const parent = btn.parentElement;
+            parent?.classList.toggle('expanded');
+            if (parent?.classList.contains('expanded')) {
+                btn.textContent = 'Read Less';
+            } else {
+                btn.textContent = 'Read More';
+            }
+            // For experience card, we still use expand/collapse
+            // FIX: Cast details to HTMLElement to access the style property. This resolves errors on lines 107, 108, and 111.
+             const details = projectCard.querySelector<HTMLElement>('.details');
+             if (details) {
+                if (details.style.display === 'block') {
+                    details.style.display = 'none';
+                    btn.textContent = 'Read More';
+                } else {
+                    details.style.display = 'block';
+                    btn.textContent = 'Read Less';
+                }
+             }
+            return; 
         }
+
+        // Handle Project card modal
+        if (!projectModalContainer || !projectModalTitle || !projectModalImg || !projectModalDetailsContent) return;
+
+        const title = projectCard.querySelector('h3')?.textContent || 'Project Details';
+        const imgSrc = projectCard.querySelector('img')?.src || '';
+        const detailsHTML = projectCard.querySelector('.details')?.innerHTML || '<p>No details available.</p>';
+        
+        projectModalTitle.textContent = title;
+        projectModalImg.src = imgSrc;
+        projectModalImg.alt = title;
+        projectModalDetailsContent.innerHTML = detailsHTML;
+
+        openModal(projectModalContainer);
     });
 });
+
 
 // --- Profile Picture Canvas Animation ---
 if (profileCanvas) {
@@ -341,58 +380,106 @@ try {
 
 const getResumeContext = () => {
     return `
-        This is the resume information for Ruturaj Dilip Gawade. Use this data to answer questions.
+        This is the resume and detailed project portfolio for Ruturaj Dilip Gawade. Use this data to answer questions.
 
         --- START OF RESUME ---
 
         Ruturaj Dilip Gawade
         +49 15560133862 | ruturajabroad@gmail.com | Walther-Rathenau-Straße 55, 39104 Magdeburg | LinkedIn
 
-        PROFILE
-        Automation & Commissioning Engineer with 3 years of hands-on experience in PLC, HMI, and SCADA-based industrial automation, delivering projects for clients of German, Italian, UK, US, and Indian origin. Proficient in Siemens, Allen-Bradley, and Mitsubishi automation platforms with exposure to Beckhoff (TwinCAT) and Schneider control environments. Experienced in commissioning, troubleshooting, field integration, and remote customer support, ensuring reliable system performance under real production conditions. Currently pursuing M.Sc. in Digital Engineering at Otto von Guericke University Magdeburg, specializing in real-time industrial data synchronization and control system integration. Fluent in English (C1) and German (A2).
+        **PROFILE**
+        Automation & Commissioning Engineer with 3 years of hands-on experience in PLC, HMI, and SCADA-based industrial automation, delivering projects for clients of German, Italian, UK, US, and Indian origin. Proficient in Siemens, Allen-Bradley, and Mitsubishi automation platforms with exposure to Beckhoff (TwinCAT) and Schneider control environments. Experienced in commissioning, troubleshooting, field integration, and remote customer support. Currently pursuing M.Sc. in Digital Engineering at Otto von Guericke University Magdeburg. Fluent in English (C1) and German (A2).
 
-        PROFESSIONAL EXPERIENCE
+        **PROFESSIONAL EXPERIENCE**
         Automation & Commissioning Engineer
         Promatics Solutions | 03.2021 - 04.2024 | Pune, India
         Executed automation and process control projects for multiple international clients, focusing on PLC/HMI logic development, on-site commissioning, fault analysis, and customer handover documentation.
 
-        Key Projects:
-        - Automotive Test Loop Line (German Client): Developed PLC/HMI logic in Mitsubishi FX5U / GX Works 3 for conveyors, turntables, presses. Conducted simulation and field commissioning.
-        - Boiler House Automation (Indian Client): Programmed a Siemens S7-1200-based boiler house with WinCC SCADA. Managed production trials and resolved signal scaling issues.
-        - Multi-Lift & Conveyor Automation System (UK Client): Modified and commissioned Allen-Bradley CompactLogix / FactoryTalk View ME logic for lift synchronization.
-        - Tea Production Plant Automation (Indian Client): Delivered full-plant automation using Siemens S7-1200 and WinCC Runtime Advanced. Handled PID tuning, alarm setup, and remote support.
-        - Wheel Hub & Hydraulic Press Machines (US Client): Designed and programmed servo/stepper-based press systems with Siemens S7-1200 and AutoCAD Electrical. Oversaw on-site commissioning and MES communication.
-        - Axle & Wheel Hub Stud Press Line (Italian Client): Modified and validated PLC-HMI systems with OPC UA-based data exchange. Added safety-curtain logic.
-        - Spices Grinding & Packing Automation (Indian Client): Developed and commissioned five independent grinding lines under a centralized SCADA using Siemens S7-1400 / TIA Portal V14.
-        - Multi-Station Axle & Bearing Assembly SCADA (Italian Client): Enhanced ASEM HMI and Industrial PC SCADA connected to Siemens S7-1200/1500 PLCs. Reorganized ≈1800 alarms and implemented recipe management.
-        - Pharma Powder Conveying & Grinding Automation (Indian Client): Commissioned Allen-Bradley CompactLogix 5370 / FactoryTalk View ME system. Verified I/O signals and calibrated transmitters.
+        **EDUCATION**
+        - Master in Digital Engineering (04.2024 – Present) - Otto von Guericke University Magdeburg, Germany
+        - Bachelor of Technology in Electrical Engineering (06.2020 - 07.2023) - Savitribai Phule Pune University, India
 
-        EDUCATION
-        - Master in Digital Engineering (04.2024 – Present)
-          Otto von Guericke University Magdeburg, Germany
-          Key Competencies: Industrial Automation & Control Systems, PLC & SCADA Integration, IoT & Edge Data Communication, Robotics & Machine Vision, Cybersecurity.
-        - Bachelor of Technology in Electrical Engineering (06.2020 - 07.2023)
-          Savitribai Phule Pune University, India
-          Key Competencies: PLC Programming & HMI Development, Industrial Instrumentation, Control Systems & Automation.
-
-        ACADEMIC PROJECTS
-        - (M.Sc.) Environmental Representation of Autonomous Robots: Developed a LiDAR- and radar-based detection system for an autonomous robot to classify humans vs. non-humans.
-        - (M.Sc.) Smart City Traffic Control and Safety Analysis: Designed a traffic simulation model in AnyLogic using real sensor data from Magdeburg City.
-        - (B.Tech.) PLC Development Using Arduino and Factory I/O Simulation: Built a low-cost automation prototype to simulate a complete packaging line.
-
-        TECHNICAL SKILLS
+        **TECHNICAL SKILLS**
         - PLC/SCADA Platforms: Siemens (TIA Portal, S7-1200/1400, WinCC), Allen-Bradley (CompactLogix, Studio 5000, FactoryTalk), Mitsubishi (FX5U, GX Works 3), Beckhoff TwinCAT, Schneider EcoStruxure.
         - Protocols & Interfaces: OPC UA, Modbus TCP, MES, IIoT, Profinet, EtherCAT, EtherNet/IP.
-        - Core Skills: PLC Programming, HMI Design, SCADA Configuration, Commissioning, Troubleshooting, PID Control, Motion & Servo Integration, Safety Interlocks, Alarm & Data Handling, Recipe Management.
-
-        PROFESSIONAL SKILLS
-        System Commissioning, Troubleshooting & Testing, Emergency Site Support, PLC-HMI Integration, Field Device Configuration, Remote Monitoring & Customer Support, Documentation & Validation, Team Coordination.
-
-        LANGUAGES
-        - English: C1 (IELTS)
-        - German: A2 (currently improving)
-
+        - Core Skills: PLC Programming, HMI Design, SCADA Configuration, Commissioning, Troubleshooting, PID Control, Motion & Servo Integration, Safety Interlocks.
+        
         --- END OF RESUME ---
+
+        --- START OF DETAILED PROJECT PORTFOLIO ---
+
+        **Project 1: Automotive Test Loop Line**
+        - Client Origin: Germany
+        - Role: PLC & HMI Programmer
+        - Technologies: Mitsubishi FX5U PLC, GX Works 3, GT Designer 3 (GOT 2000 Series HMI), Ethernet Communication, Safety Relays.
+        - Objective: To design and implement the PLC and HMI control logic for a fully automated vehicle test loop line consisting of multiple stations, including turntables, conveyors, stoppers, presses, and lift tables.
+        - Responsibilities: Developed complete PLC programs in GX Works 3; Created auto and manual operation modes; Implemented turntable and lift synchronization; Designed and configured HMI screens; Tested Auto/Manual transitions and safety logic.
+        - Key Achievements: Delivered a robust multi-station PLC + HMI solution integrating over 10 subsystems; Improved process reliability through modular, reusable PLC code blocks; Achieved synchronized operation of turntables and conveyors without collisions.
+
+        **Project 2: Boiler House Automation**
+        - Client Origin: India
+        - Role: PLC & SCADA Programmer | Commissioning Engineer
+        - Technologies: Siemens S7-1200 PLC, TIA Portal V14, WinCC SCADA, PID Control, Furnace Automation.
+        - Objective: To design, program, and commission a fully automated boiler house system including dual furnaces, fuel handling units, and safety interlocks, with complete SCADA visualization and data logging.
+        - Responsibilities: Developed PLC logic for boiler start-up, auto-run, and shutdown; Designed WinCC SCADA screens; Configured PID control loops for steam-pressure; Calibrated analog signals; Conducted full commissioning (cold, hot, and production trials).
+        - Key Achievements: Delivered a fully operational PLC + SCADA-based boiler automation system; Resolved major modulation issues, stabilizing pressure control; Designed intuitive SCADA interface for simplified operator control.
+
+        **Project 3: Multi-Lift and Conveyor Automation System**
+        - Client Origin: United Kingdom
+        - Role: PLC & HMI Programmer | On-Site Commissioning Engineer
+        - Technologies: Allen-Bradley CompactLogix PLC, Studio 5000, FactoryTalk View ME, Ethernet/IP, Encoder-Based Lift Positioning.
+        - Objective: To design, modify, and commission a multi-lift and conveyor control system for a UK-based automotive client, handling vehicle transport and elevation between assembly levels.
+        - Responsibilities: Developed and modified PLC logic in Studio 5000; Implemented encoder-based logic for accurate lift positioning; Added new conveyor logic to the existing Auto sequence; Debugged and corrected manual mode functions.
+        - Key Achievements: Successfully expanded an existing Allen-Bradley-based conveyor network with new lift integration; Achieved precise lift motion control via encoder feedback; Eliminated job spacing and sequencing issues between conveyors and lifts.
+
+        **Project 4: Tea Production Plant Complete Process Automation**
+        - Client Origin: India
+        - Role: PLC & SCADA Engineer
+        - Technologies: Siemens S7-1200 PLC, TIA Portal V16, WinCC SCADA (Runtime Advanced), PID Control, Anydesk.
+        - Objective: To develop and commission a fully automated control and monitoring system for a tea production plant, covering all stages from raw leaf feeding to packaging.
+        - Responsibilities: Designed and configured a complete SCADA system; Developed PLC logic for feeders, dryers, conveyors; Configured PID loops for temperature and humidity control; Provided online customer support through Anydesk.
+        - Key Achievements: Delivered a fully functional end-to-end automated tea manufacturing line; Reduced manual intervention by over 70%; Designed intuitive SCADA visuals providing clear process flow.
+
+        **Project 5: Wheel Hub Seal, Bearing Stud & Hydraulic Press Machines**
+        - Client Origin: United States
+        - Role: PLC, HMI & Electrical Design Engineer
+        - Technologies: Siemens S7-1200 PLC, TIA Portal V16, Servo Motor Drive, Stepper Motor Positioning, MES Communication, AutoCAD Electrical Design.
+        - Objective: To design, program, and commission two advanced press automation machines (Wheel Hub Seal Press & Hydraulic Station Press) with MES connectivity and servo/stepper control.
+        - Responsibilities: Developed PLC programs in TIA Portal V16; Integrated servo drive and stepper motor; Implemented MES–PLC data exchange; Designed and released AutoCAD electrical drawings.
+        - Key Achievements: Delivered two MES-integrated press machines operating seamlessly; Achieved real-time job selection and traceability through MES data mapping; Attained micron-level pressing accuracy via optimized servo control.
+
+        **Project 6: Axle & Wheel Hub Stud Pressing Line – OPC UA Integration**
+        - Client Origin: Italy
+        - Role: PLC & HMI Programmer | On-Site Commissioning Engineer
+        - Technologies: Siemens S7-1200 PLC, TIA Portal V14, OPC UA Communication, Safety Curtain Integration.
+        - Objective: To modify, validate, and integrate the PLC-HMI system of an automated pressing line, including OPC UA-based data exchange for centralized monitoring.
+        - Responsibilities: Modified PLC logic for a new press model; Updated and redesigned HMI screens; Developed OPC UA communication channels; Added and tested safety-curtain logic.
+        - Key Achievements: Successfully implemented OPC UA integration enabling remote process monitoring; Enhanced safety compliance through curtain interlocks; Achieved an intuitive, operator-friendly HMI interface.
+
+        **Project 7: Spices Grinding & Packing Automation**
+        - Client Origin: India
+        - Role: Automation & Commissioning Engineer
+        - Technologies: Siemens S7-1400 PLC, TIA Portal V14, TIA Portal SCADA (WinCC Runtime Advanced), Multi-Line Automation.
+        - Objective: To design, test, and commission an integrated automation system for five independent spice grinding and packing lines, controlled via a centralized SCADA.
+        - Responsibilities: Developed modular PLC logic for five lines; Developed centralized SCADA for all five lines; Performed no-load and on-load testing; Addressed and resolved fan tripping issues.
+        - Key Achievements: Successfully commissioned all five systems under a unified SCADA monitoring station; Improved operational visibility by centralizing five PLCs; Delivered stable production-ready logic.
+
+        **Project 8: Multi-Station Axle & Bearing Assembly SCADA Integration**
+        - Client Origin: Italy
+        - Role: SCADA Development & Integration Engineer
+        - Technologies: ASEM Industrial PC (Supervisory), ASEM HMI Panels, CSV Tag & Alarm Configuration, OPC Communication, Siemens S7-1200/1500 PLC, Recipe Management.
+        - Objective: To enhance and integrate a four-station automated axle and bearing assembly line, implementing efficient alarm management (~1800 alarms), manual operation, and recipe control.
+        - Responsibilities: Optimized the SCADA layer; Reorganized and optimized a large-scale alarm system (≈1800 alarms) using CSV import/export; Developed recipe management functionality; Performed detailed testing and debugging.
+        - Key Achievements: Delivered a robust and synchronized multi-station SCADA system; Streamlined a complex 1800-alarm database, improving accuracy; Established recipe-based production flexibility, reducing changeover time.
+
+        **Project 9: Pharma Powder Conveying & Grinding Automation**
+        - Client Origin: India
+        - Role: Automation & Commissioning Engineer
+        - Technologies: CompactLogix 5370, Studio 5000 (v32), PanelView Plus 7, FactoryTalk View ME, EtherNet/IP, VFDs.
+        - Objective: To commission and validate an automated line for powder conveying, grinding, mixing, weighment and packing, ensuring reliable AUTO/MANUAL operation and safe interlocks.
+        - Responsibilities: Performed complete I/O verification and sensor calibration; Implemented and tested PLC sequencing for three auto cycles; Configured VFD integration (start/stop, setpoints, fault handling); Implemented safety permissives (metal detector, e-stop).
+        - Key Achievements: Verified stable AUTO/MANUAL operation across all subsystems; Completed dry-run auto cycles using signal simulation for FAT-style validation; Strengthened alarm and interlock logic, reducing unsafe starts.
+        --- END OF DETAILED PROJECT PORTFOLIO ---
     `;
 };
 
