@@ -11,7 +11,7 @@ const chatHistory = document.getElementById('chat-history');
 const chatInput = document.getElementById('chat-input') as HTMLInputElement;
 const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const loader = document.getElementById('loader');
-const skillsCanvas = document.getElementById('skills-canvas') as HTMLCanvasElement;
+const backgroundCanvas = document.getElementById('background-canvas') as HTMLCanvasElement;
 const profileCanvas = document.getElementById('profile-canvas') as HTMLCanvasElement;
 
 // Modal Elements
@@ -19,7 +19,6 @@ const chatBubble = document.getElementById('chat-bubble');
 const chatModalContainer = document.getElementById('chat-modal-container');
 const emailModalContainer = document.getElementById('email-modal-container');
 const projectModalContainer = document.getElementById('project-modal-container');
-const projectModalImg = document.getElementById('project-modal-img') as HTMLImageElement;
 const projectModalTitle = document.getElementById('project-modal-title');
 const projectModalDetailsContent = document.getElementById('project-modal-details-content');
 const getInTouchBtn = document.getElementById('get-in-touch-btn');
@@ -84,48 +83,28 @@ revealElements.forEach(el => {
 });
 
 
-// --- "Read More" Logic for Project Modals ---
+// --- "Read More" Logic for Project & Experience Cards ---
 const readMoreBtns = document.querySelectorAll('.read-more-btn');
 readMoreBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const projectCard = (btn as HTMLElement).closest('.project-card, .experience-card');
-        if (!projectCard) return;
+        const card = (btn as HTMLElement).closest('.project-card, .experience-card');
+        if (!card) return;
 
-        // Handle Experience card expansion separately
-        if (projectCard.classList.contains('experience-card')) {
-            const parent = btn.parentElement;
-            parent?.classList.toggle('expanded');
-            if (parent?.classList.contains('expanded')) {
-                btn.textContent = 'Read Less';
-            } else {
-                btn.textContent = 'Read More';
-            }
-            // For experience card, we still use expand/collapse
-            // FIX: Cast details to HTMLElement to access the style property. This resolves errors on lines 107, 108, and 111.
-             const details = projectCard.querySelector<HTMLElement>('.details');
-             if (details) {
-                if (details.style.display === 'block') {
-                    details.style.display = 'none';
-                    btn.textContent = 'Read More';
-                } else {
-                    details.style.display = 'block';
-                    btn.textContent = 'Read Less';
-                }
-             }
-            return; 
+        // Handle Experience card expansion (accordion)
+        if (card.classList.contains('experience-card')) {
+            card.classList.toggle('expanded');
+            btn.textContent = card.classList.contains('expanded') ? 'Read Less' : 'Read More';
+            return;
         }
 
         // Handle Project card modal
-        if (!projectModalContainer || !projectModalTitle || !projectModalImg || !projectModalDetailsContent) return;
+        if (!projectModalContainer || !projectModalTitle || !projectModalDetailsContent) return;
 
-        const title = projectCard.querySelector('h3')?.textContent || 'Project Details';
-        const imgSrc = projectCard.querySelector('img')?.src || '';
-        const detailsHTML = projectCard.querySelector('.details')?.innerHTML || '<p>No details available.</p>';
+        const title = card.querySelector('h3')?.textContent || 'Project Details';
+        const detailsHTML = card.querySelector('.details')?.innerHTML || '<p>No details available.</p>';
         
         projectModalTitle.textContent = title;
-        projectModalImg.src = imgSrc;
-        projectModalImg.alt = title;
         projectModalDetailsContent.innerHTML = detailsHTML;
 
         openModal(projectModalContainer);
@@ -244,37 +223,24 @@ if (profileCanvas) {
     p_animate();
 }
 
-// --- Skills Canvas Animation ---
-if (skillsCanvas) {
-    const ctx = skillsCanvas.getContext('2d');
+// --- Fullscreen Canvas Animation ---
+if (backgroundCanvas) {
+    const ctx = backgroundCanvas.getContext('2d');
     let particlesArray: Particle[] = [];
-    const numberOfParticles = 80;
-
-    const skillsSection = document.getElementById('skills');
 
     const setCanvasSize = () => {
-        if (skillsSection && ctx) {
-            skillsCanvas.width = skillsSection.offsetWidth;
-            skillsCanvas.height = skillsSection.offsetHeight;
+        if (ctx) {
+            backgroundCanvas.width = window.innerWidth;
+            backgroundCanvas.height = window.innerHeight;
         }
     };
 
-    const mouse = {
-        x: null,
-        y: null,
-        radius: 150
+    const calculateParticles = () => {
+        const area = backgroundCanvas.width * backgroundCanvas.height;
+        return Math.max(50, Math.floor(area / 20000));
     };
 
-    window.addEventListener('mousemove', (event) => {
-        const rect = skillsCanvas.getBoundingClientRect();
-        mouse.x = event.clientX - rect.left;
-        mouse.y = event.clientY - rect.top;
-    });
-
-    skillsSection?.addEventListener('mouseleave', () => {
-        mouse.x = null;
-        mouse.y = null;
-    });
+    let numberOfParticles = calculateParticles();
 
     class Particle {
         x: number;
@@ -284,7 +250,7 @@ if (skillsCanvas) {
         size: number;
         color: string;
 
-        constructor(x, y, directionX, directionY, size, color) {
+        constructor(x: number, y: number, directionX: number, directionY: number, size: number, color: string) {
             this.x = x;
             this.y = y;
             this.directionX = directionX;
@@ -297,16 +263,16 @@ if (skillsCanvas) {
             if (ctx) {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.5)';
+                ctx.fillStyle = this.color;
                 ctx.fill();
             }
         }
 
         update() {
-            if (this.x > skillsCanvas.width || this.x < 0) {
+            if (this.x > backgroundCanvas.width || this.x < 0) {
                 this.directionX = -this.directionX;
             }
-            if (this.y > skillsCanvas.height || this.y < 0) {
+            if (this.y > backgroundCanvas.height || this.y < 0) {
                 this.directionY = -this.directionY;
             }
             this.x += this.directionX;
@@ -317,13 +283,14 @@ if (skillsCanvas) {
 
     function init() {
         particlesArray = [];
+        numberOfParticles = calculateParticles();
         for (let i = 0; i < numberOfParticles; i++) {
             const size = (Math.random() * 2) + 1;
-            const x = (Math.random() * (skillsCanvas.width - size * 2) + size);
-            const y = (Math.random() * (skillsCanvas.height - size * 2) + size);
-            const directionX = (Math.random() * .4) - .2;
-            const directionY = (Math.random() * .4) - .2;
-            const color = 'rgba(0, 255, 204, 0.5)';
+            const x = (Math.random() * (backgroundCanvas.width - size * 2) + size);
+            const y = (Math.random() * (backgroundCanvas.height - size * 2) + size);
+            const directionX = (Math.random() * 0.6) - 0.3;
+            const directionY = (Math.random() * 0.6) - 0.3;
+            const color = 'rgba(0, 255, 204, 0.7)';
             particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
         }
     }
@@ -331,13 +298,16 @@ if (skillsCanvas) {
     function connect() {
         if (!ctx) return;
         let opacityValue = 1;
+        const connectRadius = 120;
         for (let a = 0; a < particlesArray.length; a++) {
             for (let b = a; b < particlesArray.length; b++) {
-                const distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                               ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                if (distance < (skillsCanvas.width / 7) * (skillsCanvas.height / 7)) {
-                    opacityValue = 1 - (distance / 20000);
-                    ctx.strokeStyle = `rgba(0, 255, 204, ${opacityValue})`;
+                const dx = particlesArray[a].x - particlesArray[b].x;
+                const dy = particlesArray[a].y - particlesArray[b].y;
+                const distanceSquared = dx * dx + dy * dy;
+
+                if (distanceSquared < connectRadius * connectRadius) {
+                    opacityValue = 1 - (distanceSquared / (connectRadius * connectRadius));
+                    ctx.strokeStyle = `rgba(0, 255, 204, ${opacityValue * 0.8})`;
                     ctx.lineWidth = 1;
                     ctx.beginPath();
                     ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
@@ -351,14 +321,14 @@ if (skillsCanvas) {
     function animate() {
         requestAnimationFrame(animate);
         if (ctx) {
-            ctx.clearRect(0, 0, skillsCanvas.width, skillsCanvas.height);
+            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
             for (let i = 0; i < particlesArray.length; i++) {
                 particlesArray[i].update();
             }
             connect();
         }
     }
-    
+
     window.addEventListener('resize', () => {
         setCanvasSize();
         init();
@@ -368,6 +338,7 @@ if (skillsCanvas) {
     init();
     animate();
 }
+
 
 // --- Gemini AI Assistant ---
 let ai;
@@ -379,108 +350,103 @@ try {
 }
 
 const getResumeContext = () => {
-    return `
-        This is the resume and detailed project portfolio for Ruturaj Dilip Gawade. Use this data to answer questions.
+    // Resume part remains hardcoded as it's not present in a structured way in the DOM body.
+    const resumeText = `
+        This is the resume for Ruturaj Dilip Gawade. Use this data, along with the detailed project portfolio that follows, to answer questions.
 
         --- START OF RESUME ---
 
-        Ruturaj Dilip Gawade
+        **Ruturaj Dilip Gawade**
         +49 15560133862 | ruturajabroad@gmail.com | Walther-Rathenau-Straße 55, 39104 Magdeburg | LinkedIn
 
         **PROFILE**
-        Automation & Commissioning Engineer with 3 years of hands-on experience in PLC, HMI, and SCADA-based industrial automation, delivering projects for clients of German, Italian, UK, US, and Indian origin. Proficient in Siemens, Allen-Bradley, and Mitsubishi automation platforms with exposure to Beckhoff (TwinCAT) and Schneider control environments. Experienced in commissioning, troubleshooting, field integration, and remote customer support. Currently pursuing M.Sc. in Digital Engineering at Otto von Guericke University Magdeburg. Fluent in English (C1) and German (A2).
+        Automation & Commissioning Engineer with 3 years of hands-on experience in PLC, HMI, and SCADA-based industrial automation, delivering projects for clients of German, Italian, UK, US, and Indian origin. Proficient in Siemens, Allen-Bradley, and Mitsubishi automation platforms with exposure to Beckhoff (TwinCAT) and Schneider control environments. Experienced in commissioning, troubleshooting, field integration, and remote customer support, ensuring reliable system performance under real production conditions. Currently pursuing M.Sc. in Digital Engineering at Otto von Guericke University Magdeburg, specializing in real-time industrial data synchronization and control system integration. Fluent in English (C1) and German (A2) possessing the language skills necessary for effective communication in diverse environments.
 
         **PROFESSIONAL EXPERIENCE**
-        Automation & Commissioning Engineer
+        **Automation & Commissioning Engineer**
         Promatics Solutions | 03.2021 - 04.2024 | Pune, India
-        Executed automation and process control projects for multiple international clients, focusing on PLC/HMI logic development, on-site commissioning, fault analysis, and customer handover documentation.
+        Executed automation and process control projects for multiple clients of international origin, focusing on PLC/HMI logic development, on-site commissioning, fault analysis, and customer handover documentation. See the detailed project portfolio section below for full descriptions of projects including:
+        * Automotive Test Loop Line (German Client)
+        * Boiler House Automation (Indian Client)
+        * Multi-Lift & Conveyor Automation System (UK Client)
+        * Tea Production Plant Automation (Indian Client)
+        * Wheel Hub & Hydraulic Press Machines (US Client)
+        * Axle & Wheel Hub Stud Pressing Line (Italian Client)
+        * Spices Grinding & Packing Automation (Indian Client)
+        * Multi-Station Axle & Bearing Assembly SCADA Integration (Italian Client)
+        * Pharma Powder Conveying & Grinding Automation (Indian Client)
 
         **EDUCATION**
-        - Master in Digital Engineering (04.2024 – Present) - Otto von Guericke University Magdeburg, Germany
-        - Bachelor of Technology in Electrical Engineering (06.2020 - 07.2023) - Savitribai Phule Pune University, India
+        *   **Master in Digital Engineering** (04.2024 – Present) | Magdeburg, Germany
+            Otto von Guericke University Magdeburg
+            *Key Competencies:* Industrial Automation & Control Systems | PLC & SCADA Integration | IoT & Edge Data Communication | Robotics & Machine Vision | System Simulation & Modeling | Cybersecurity in Industrial Networks
+        *   **Bachelor of Technology in Electrical Engineering** (06.2020 - 07.2023) | Pune, India
+            Savitribai Phule Pune University
+            *Key Competencies:* PLC Programming & HMI Development | Industrial Instrumentation | Control Systems & Automation | Electrical Design & Power Electronics | Motor Drives & Energy Systems
+
+        **ACADEMIC PROJECTS**
+        *   **(M.Sc.) Environmental Representation of Autonomous Robots:** Developed a LiDAR- and radar-based detection system for an autonomous robot to classify humans vs. non-humans. Integrated sensor communication and point-cloud data processing, enabling real-time visualization through LED indicators.
+        *   **(M.Sc.) Smart City Traffic Control and Safety Analysis (with City of Magdeburg):** Designed a traffic simulation model in AnyLogic using real sensor and network data provided by Magdeburg City. Implemented data visualization and reporting mechanisms resembling SCADA dashboards to analyze pedestrian safety and optimize traffic-light logic for reduced congestion.
+        *   **(B.Tech.) PLC Development Using Arduino and Factory I/O Simulation:** Built a low-cost automation prototype integrating an Arduino controller with Factory I/O to simulate a complete packaging line. Programmed ladder logic, enabled web-based monitoring, and demonstrated I/O handling, sequence control, and fault simulation for industrial training and validation.
 
         **TECHNICAL SKILLS**
-        - PLC/SCADA Platforms: Siemens (TIA Portal, S7-1200/1400, WinCC), Allen-Bradley (CompactLogix, Studio 5000, FactoryTalk), Mitsubishi (FX5U, GX Works 3), Beckhoff TwinCAT, Schneider EcoStruxure.
-        - Protocols & Interfaces: OPC UA, Modbus TCP, MES, IIoT, Profinet, EtherCAT, EtherNet/IP.
-        - Core Skills: PLC Programming, HMI Design, SCADA Configuration, Commissioning, Troubleshooting, PID Control, Motion & Servo Integration, Safety Interlocks.
-        
+        PLC Programming | HMI Design | SCADA Configuration | Commissioning | Industrial Automation | Troubleshooting | OPC UA | TIA Portal | FactoryTalk | WinCC | Siemens S7-1200 / S7-1400 | Allen-Bradley CompactLogix (Studio 5000) | Mitsubishi FX5U (GX Works 3) | Beckhoff TwinCAT | Schneider EcoStruxure | WinCC (Runtime Advanced / SCADA) | FactoryTalk View ME | GT Designer 3 | ASEM Industrial PC Interfaces | Modbus TCP | MES | IIoT | Profinet | EtherCAT | DCS | EtherNet/IP | PID Control | Motion & Servo Integration | Safety Interlocks | Alarm & Data Handling | Recipe Management
+
+        **PROFESSIONAL SKILLS**
+        System Commissioning | Troubleshooting & Testing | Emergency Site Support | PLC-HMI Integration | Field Device Configuration (VFDs, Sensors, Transmitters) | Signal Calibration | Remote Monitoring & Customer Support | Documentation & Validation | Team Coordination & Technical Reporting
+
+        **LANGUAGES**
+        *   English: C1 (IELTS)
+        *   German: A2 (currently improving)
+
         --- END OF RESUME ---
-
-        --- START OF DETAILED PROJECT PORTFOLIO ---
-
-        **Project 1: Automotive Test Loop Line**
-        - Client Origin: Germany
-        - Role: PLC & HMI Programmer
-        - Technologies: Mitsubishi FX5U PLC, GX Works 3, GT Designer 3 (GOT 2000 Series HMI), Ethernet Communication, Safety Relays.
-        - Objective: To design and implement the PLC and HMI control logic for a fully automated vehicle test loop line consisting of multiple stations, including turntables, conveyors, stoppers, presses, and lift tables.
-        - Responsibilities: Developed complete PLC programs in GX Works 3; Created auto and manual operation modes; Implemented turntable and lift synchronization; Designed and configured HMI screens; Tested Auto/Manual transitions and safety logic.
-        - Key Achievements: Delivered a robust multi-station PLC + HMI solution integrating over 10 subsystems; Improved process reliability through modular, reusable PLC code blocks; Achieved synchronized operation of turntables and conveyors without collisions.
-
-        **Project 2: Boiler House Automation**
-        - Client Origin: India
-        - Role: PLC & SCADA Programmer | Commissioning Engineer
-        - Technologies: Siemens S7-1200 PLC, TIA Portal V14, WinCC SCADA, PID Control, Furnace Automation.
-        - Objective: To design, program, and commission a fully automated boiler house system including dual furnaces, fuel handling units, and safety interlocks, with complete SCADA visualization and data logging.
-        - Responsibilities: Developed PLC logic for boiler start-up, auto-run, and shutdown; Designed WinCC SCADA screens; Configured PID control loops for steam-pressure; Calibrated analog signals; Conducted full commissioning (cold, hot, and production trials).
-        - Key Achievements: Delivered a fully operational PLC + SCADA-based boiler automation system; Resolved major modulation issues, stabilizing pressure control; Designed intuitive SCADA interface for simplified operator control.
-
-        **Project 3: Multi-Lift and Conveyor Automation System**
-        - Client Origin: United Kingdom
-        - Role: PLC & HMI Programmer | On-Site Commissioning Engineer
-        - Technologies: Allen-Bradley CompactLogix PLC, Studio 5000, FactoryTalk View ME, Ethernet/IP, Encoder-Based Lift Positioning.
-        - Objective: To design, modify, and commission a multi-lift and conveyor control system for a UK-based automotive client, handling vehicle transport and elevation between assembly levels.
-        - Responsibilities: Developed and modified PLC logic in Studio 5000; Implemented encoder-based logic for accurate lift positioning; Added new conveyor logic to the existing Auto sequence; Debugged and corrected manual mode functions.
-        - Key Achievements: Successfully expanded an existing Allen-Bradley-based conveyor network with new lift integration; Achieved precise lift motion control via encoder feedback; Eliminated job spacing and sequencing issues between conveyors and lifts.
-
-        **Project 4: Tea Production Plant Complete Process Automation**
-        - Client Origin: India
-        - Role: PLC & SCADA Engineer
-        - Technologies: Siemens S7-1200 PLC, TIA Portal V16, WinCC SCADA (Runtime Advanced), PID Control, Anydesk.
-        - Objective: To develop and commission a fully automated control and monitoring system for a tea production plant, covering all stages from raw leaf feeding to packaging.
-        - Responsibilities: Designed and configured a complete SCADA system; Developed PLC logic for feeders, dryers, conveyors; Configured PID loops for temperature and humidity control; Provided online customer support through Anydesk.
-        - Key Achievements: Delivered a fully functional end-to-end automated tea manufacturing line; Reduced manual intervention by over 70%; Designed intuitive SCADA visuals providing clear process flow.
-
-        **Project 5: Wheel Hub Seal, Bearing Stud & Hydraulic Press Machines**
-        - Client Origin: United States
-        - Role: PLC, HMI & Electrical Design Engineer
-        - Technologies: Siemens S7-1200 PLC, TIA Portal V16, Servo Motor Drive, Stepper Motor Positioning, MES Communication, AutoCAD Electrical Design.
-        - Objective: To design, program, and commission two advanced press automation machines (Wheel Hub Seal Press & Hydraulic Station Press) with MES connectivity and servo/stepper control.
-        - Responsibilities: Developed PLC programs in TIA Portal V16; Integrated servo drive and stepper motor; Implemented MES–PLC data exchange; Designed and released AutoCAD electrical drawings.
-        - Key Achievements: Delivered two MES-integrated press machines operating seamlessly; Achieved real-time job selection and traceability through MES data mapping; Attained micron-level pressing accuracy via optimized servo control.
-
-        **Project 6: Axle & Wheel Hub Stud Pressing Line – OPC UA Integration**
-        - Client Origin: Italy
-        - Role: PLC & HMI Programmer | On-Site Commissioning Engineer
-        - Technologies: Siemens S7-1200 PLC, TIA Portal V14, OPC UA Communication, Safety Curtain Integration.
-        - Objective: To modify, validate, and integrate the PLC-HMI system of an automated pressing line, including OPC UA-based data exchange for centralized monitoring.
-        - Responsibilities: Modified PLC logic for a new press model; Updated and redesigned HMI screens; Developed OPC UA communication channels; Added and tested safety-curtain logic.
-        - Key Achievements: Successfully implemented OPC UA integration enabling remote process monitoring; Enhanced safety compliance through curtain interlocks; Achieved an intuitive, operator-friendly HMI interface.
-
-        **Project 7: Spices Grinding & Packing Automation**
-        - Client Origin: India
-        - Role: Automation & Commissioning Engineer
-        - Technologies: Siemens S7-1400 PLC, TIA Portal V14, TIA Portal SCADA (WinCC Runtime Advanced), Multi-Line Automation.
-        - Objective: To design, test, and commission an integrated automation system for five independent spice grinding and packing lines, controlled via a centralized SCADA.
-        - Responsibilities: Developed modular PLC logic for five lines; Developed centralized SCADA for all five lines; Performed no-load and on-load testing; Addressed and resolved fan tripping issues.
-        - Key Achievements: Successfully commissioned all five systems under a unified SCADA monitoring station; Improved operational visibility by centralizing five PLCs; Delivered stable production-ready logic.
-
-        **Project 8: Multi-Station Axle & Bearing Assembly SCADA Integration**
-        - Client Origin: Italy
-        - Role: SCADA Development & Integration Engineer
-        - Technologies: ASEM Industrial PC (Supervisory), ASEM HMI Panels, CSV Tag & Alarm Configuration, OPC Communication, Siemens S7-1200/1500 PLC, Recipe Management.
-        - Objective: To enhance and integrate a four-station automated axle and bearing assembly line, implementing efficient alarm management (~1800 alarms), manual operation, and recipe control.
-        - Responsibilities: Optimized the SCADA layer; Reorganized and optimized a large-scale alarm system (≈1800 alarms) using CSV import/export; Developed recipe management functionality; Performed detailed testing and debugging.
-        - Key Achievements: Delivered a robust and synchronized multi-station SCADA system; Streamlined a complex 1800-alarm database, improving accuracy; Established recipe-based production flexibility, reducing changeover time.
-
-        **Project 9: Pharma Powder Conveying & Grinding Automation**
-        - Client Origin: India
-        - Role: Automation & Commissioning Engineer
-        - Technologies: CompactLogix 5370, Studio 5000 (v32), PanelView Plus 7, FactoryTalk View ME, EtherNet/IP, VFDs.
-        - Objective: To commission and validate an automated line for powder conveying, grinding, mixing, weighment and packing, ensuring reliable AUTO/MANUAL operation and safe interlocks.
-        - Responsibilities: Performed complete I/O verification and sensor calibration; Implemented and tested PLC sequencing for three auto cycles; Configured VFD integration (start/stop, setpoints, fault handling); Implemented safety permissives (metal detector, e-stop).
-        - Key Achievements: Verified stable AUTO/MANUAL operation across all subsystems; Completed dry-run auto cycles using signal simulation for FAT-style validation; Strengthened alarm and interlock logic, reducing unsafe starts.
-        --- END OF DETAILED PROJECT PORTFOLIO ---
     `;
+
+    // Dynamically build project portfolio from the DOM to ensure a single source of truth.
+    let projectsData = '\n\n--- START OF DETAILED PROJECT PORTFOLIO ---\n\n';
+    const projectCards = document.querySelectorAll('.project-card');
+
+    projectCards.forEach((card, index) => {
+        const title = card.querySelector('h3')?.textContent?.trim();
+        const summary = card.querySelector('p')?.textContent?.trim();
+        const detailsContainer = card.querySelector('.details');
+        
+        projectsData += `**Project ${index + 1}: ${title}**\n`;
+        if (summary) {
+            projectsData += `${summary}\n`;
+        }
+        
+        if (detailsContainer) {
+            detailsContainer.childNodes.forEach(node => {
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                const element = node as HTMLElement;
+                const text = element.textContent?.trim();
+                if (!text) return;
+
+                switch(element.tagName.toLowerCase()) {
+                    case 'h4':
+                        projectsData += `\n**${text}**\n`;
+                        break;
+                    case 'p':
+                        projectsData += `${text}\n`;
+                        break;
+                    case 'ul':
+                        element.querySelectorAll('li').forEach(li => {
+                            const liText = li.textContent?.trim();
+                            if (liText) {
+                                projectsData += `- ${liText}\n`;
+                            }
+                        });
+                        break;
+                }
+            });
+        }
+        projectsData += '\n---\n\n'; // Separator between projects
+    });
+    projectsData += '--- END OF DETAILED PROJECT PORTFOLIO ---\n';
+
+    return resumeText + projectsData;
 };
 
 async function handleSendMessage() {

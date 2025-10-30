@@ -27,26 +27,15 @@ body {
     overflow-x: hidden;
 }
 
-/* Animated Background */
-.animated-bg {
+/* Fullscreen Particle Background */
+#background-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -2;
-    background-image:
-        linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: moveBg 10s linear infinite;
+    z-index: -1;
 }
-
-@keyframes moveBg {
-    0% { background-position: 0 0; }
-    100% { background-position: 50px 50px; }
-}
-
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -188,30 +177,7 @@ section {
     align-items: center;
     text-align: center;
     position: relative;
-    overflow: hidden;
     padding: 0;
-}
-
-#bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -1;
-    transform: translateX(-50%) translateY(-50%);
-}
-
-.video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 0;
 }
 
 .hero-content {
@@ -239,7 +205,7 @@ section {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-color);
+    background: transparent; /* Changed from var(--bg-color) to see particle bg */
     overflow: hidden;
 }
 
@@ -280,6 +246,12 @@ section {
     font-family: var(--font-secondary);
     color: var(--text-color);
     margin-bottom: 2rem;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .btn {
@@ -324,8 +296,8 @@ section {
 
 .profile-pic-container {
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
     border-radius: 50%;
     border: 3px solid var(--primary-color);
     box-shadow: 0 0 15px var(--primary-color);
@@ -358,74 +330,72 @@ section {
     position: relative;
 }
 
-#skills-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-.skills-grid {
+.skills-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
     position: relative;
     z-index: 2;
 }
 
-.skill-card {
+.skill-category-card {
     background: var(--card-bg-color);
-    padding: 1.5rem;
-    text-align: center;
+    padding: 2rem;
     border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
     border-radius: 8px;
     transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.skill-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    border-color: var(--primary-color);
+}
+
+.skill-category-card h3 {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    animation: float 6s ease-in-out infinite;
-}
-
-.skill-card:nth-child(2) { animation-delay: 1s; }
-.skill-card:nth-child(3) { animation-delay: 2s; }
-.skill-card:nth-child(4) { animation-delay: 3s; }
-.skill-card:nth-child(5) { animation-delay: 0.5s; }
-.skill-card:nth-child(6) { animation-delay: 1.5s; }
-.skill-card:nth-child(7) { animation-delay: 2.5s; }
-.skill-card:nth-child(8) { animation-delay: 0.2s; }
-
-
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-.skill-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
-    animation-play-state: paused;
-}
-
-.skill-card i {
-    font-size: 3rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
     color: var(--primary-color);
+    font-family: var(--font-secondary);
+    font-size: 1.2rem;
+    text-transform: none;
+    letter-spacing: 1px;
 }
 
-.skill-card span {
-    font-family: var(--font-secondary);
+.skill-category-card h3 i {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    width: 25px; /* for alignment */
+    text-align: center;
+}
+
+.skill-category-card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.skill-category-card li {
+    margin-bottom: 0.6rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.skill-category-card li::before {
+    content: '»';
+    color: var(--secondary-color);
+    position: absolute;
+    left: 0;
     font-weight: bold;
 }
 
-/* Experience Section & Project Section Commonalities */
-.details {
+
+/* Details Section Commonalities */
+.project-card .details {
     display: none;
 }
-
 .details ul {
     list-style-position: inside;
     padding-left: 1rem;
@@ -474,6 +444,18 @@ section {
     color: #aaa;
     margin-bottom: 1rem;
 }
+
+.experience-card .details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, margin-top 0.5s ease-out;
+}
+
+.experience-card.expanded .details {
+    max-height: 500px; /* A large enough value to show all content */
+    margin-top: 1rem;
+}
+
 
 /* Education Section */
 .education-grid {
@@ -542,8 +524,8 @@ section {
 .project-card img {
     width: 100%;
     height: 180px;
-    object-fit: contain;
-    background-color: #e0e0e0;
+    object-fit: cover;
+    background-color: #111;
     border-radius: 4px;
     margin-bottom: 1.5rem;
     border: 1px solid var(--border-color);
@@ -862,26 +844,7 @@ section {
     width: 90%;
 }
 
-.project-modal-body {
-    display: flex;
-    gap: 2rem;
-}
-
-.project-modal-image-container {
-    flex: 1;
-    min-width: 280px;
-}
-
-#project-modal-img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: #e0e0e0;
-}
-
 .project-modal-details {
-    flex: 2;
     max-height: 70vh;
     overflow-y: auto;
     padding-right: 1rem;
@@ -989,9 +952,6 @@ footer {
         text-align: center;
     }
 
-    .project-modal-body {
-        flex-direction: column;
-    }
     .project-modal-details {
          max-height: 50vh;
     }
